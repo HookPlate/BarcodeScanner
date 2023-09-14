@@ -10,6 +10,7 @@ import SwiftUI
 struct ScannerView: UIViewControllerRepresentable {
     
     @Binding var scannedCode: String
+    @Binding var alertItem: AlertItem?
     
     //gets called automatically when a scannerview gets built
     func makeUIViewController(context: Context) -> ScannerVC {
@@ -36,7 +37,12 @@ struct ScannerView: UIViewControllerRepresentable {
         }
         
         func didSurface(error: CameraError) {
-            print(error.rawValue)
+            switch error {
+            case .invalidDeviceInput:
+                scannerView.alertItem = AlertContext.invalidDeviceInput
+            case .invalidScannedValue:
+                scannerView.alertItem = AlertContext.invalidScannedType
+            }
         }
         
         
@@ -44,8 +50,8 @@ struct ScannerView: UIViewControllerRepresentable {
     
 }
 
-struct ScannerView_Previews: PreviewProvider {
-    static var previews: some View {
-        ScannerView(scannedCode: .constant("12345"))
-    }
-}
+//struct ScannerView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ScannerView(scannedCode: .constant("12345"))
+//    }
+//}

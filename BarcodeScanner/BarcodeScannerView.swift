@@ -7,15 +7,31 @@
 
 import SwiftUI
 
+struct AlertItem: Identifiable {
+    let id = UUID()
+    let title: String
+    let message: String
+    let button: Alert.Button
+}
+
+struct AlertContext {
+    static let invalidDeviceInput = AlertItem(title: "Invalid Device Input",
+                                              message: "Something is wrong with the camera, we are unable to capture the input.",
+                                              button: .default(Text("Ok")))
+    static let invalidScannedType = AlertItem(title: "Invalid Scan Type",
+                                              message: "The value scanned is not valid. This app scans EAN-8 and EAN-13",
+                                              button: .default(Text("Ok")))
+}
+
 struct BarcodeScannerView: View {
     
     @State private var scannedCode = ""
-    @State private var isShowingAlert = false
+    @State private var alertItem: AlertItem?
     
     var body: some View {
         NavigationView {
             VStack {
-                ScannerView(scannedCode: $scannedCode)
+                ScannerView(scannedCode: $scannedCode, alertItem: $alertItem)
                     .frame(maxWidth: .infinity, maxHeight: 300)
                 Spacer()
                     .frame(height: 60)
@@ -27,16 +43,14 @@ struct BarcodeScannerView: View {
                     .font(.largeTitle)
                     .foregroundColor(scannedCode.isEmpty ? .red : .green)
                     .padding()
-                Button {
-                    isShowingAlert = true
-                } label: {
-                    Text("Tap me")
-                }
                 
             }
             .navigationTitle("Barcode Scanner")
-            .alert(isPresented: $isShowingAlert) {
-                Alert(title: Text("Test"), message: Text("this is a test"), dismissButton: .default(Text("Okay")))
+            //can't have more than one alert on an item hence creating the AlertItem and AlertCOntext structs.
+            .alert(item: $alertItem) { alertItem in
+                Alert(title: Text(alertItem.title),
+                      message: Text(alertItem.message),
+                      dismissButton: alertItem.button)
             }
         }
     }
